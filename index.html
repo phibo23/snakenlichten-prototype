@@ -264,9 +264,11 @@
             case "NW":
             case "SE":
             case "SW":
-              var currentCell = board.cells[snake.headPosition.boardX][snake.headPosition.boardY];
-              currentCell.attr("data-change-direction", snake.direction);
-              snake.direction = newDirection;
+              if (newDirection != board.getOppositeDirection(snake.direction)) {
+                var currentCell = board.cells[snake.headPosition.boardX][snake.headPosition.boardY];
+                currentCell.attr("data-change-direction", snake.direction);
+                snake.direction = newDirection;
+              }
               break;
           }
       }
