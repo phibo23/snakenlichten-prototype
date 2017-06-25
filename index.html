@@ -223,8 +223,8 @@
                   var cell = board.cells[drawX][drawY];
                   cell.attr("fill",drawColor);
                   cell.attr("data-body-part", snake.length-i);
-                  var newDirection = cell.attr("data-change-direction");
-                  if (cell.attr("data-change-direction")) {
+                  var newDirection = cell.attr("data-old-direction");
+                  if (cell.attr("data-old-direction")) {
                       bodyDirection = board.getOppositeDirection(newDirection);
                   }
                   var next = board.getNextCoordinates(drawX, drawY, bodyDirection);
@@ -232,7 +232,7 @@
                   drawY = next[1];
                   drawColor = drawColor.darker(0.1);
               }
-              svg.selectAll("polyline[fill=black]").attr("data-change-direction", null)
+              svg.selectAll("polyline[fill=black]").attr("data-old-direction", null)
           },
 
           move: function() {
@@ -309,8 +309,8 @@
               if (newDirection != board.getOppositeDirection(snake.direction)) {
                 var currentCell = board.cells[snake.headPosition.boardX][snake.headPosition.boardY];
                 //prevent losing old direction on multiple direction inputs
-                if (!currentCell.attr("data-change-direction")) {
-                    currentCell.attr("data-change-direction", snake.direction);
+                if (!currentCell.attr("data-old-direction")) {
+                    currentCell.attr("data-old-direction", snake.direction);
                 }
                 snake.direction = newDirection;
               }
