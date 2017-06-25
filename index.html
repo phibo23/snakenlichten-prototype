@@ -37,6 +37,78 @@
           edgeLength: 13,
           cellSize: 30,
 
+          getNextCoordinates: function(boardX,boardY,direction) {
+            switch (direction) {
+              case "E":
+                return board.getNextRight(boardX,boardY);
+                break;
+              case "W":
+                return board.getNextLeft(boardX,boardY);
+                break;
+              case "NE":
+                if (boardX % 2 == boardY % 2) {
+                  return board.getNextRight(boardX,boardY);
+                } else {
+                  return board.getNextUp(boardX,boardY);
+                }
+                break;
+              case "NW":
+                if (boardX % 2 == boardY % 2) {
+                  return board.getNextLeft(boardX,boardY);
+                } else {
+                  return board.getNextUp(boardX,boardY);
+                }
+                break;
+              case "SE":
+                if (boardX % 2 == boardY % 2) {
+                  return board.getNextDown(boardX,boardY);
+                } else {
+                  return board.getNextRight(boardX,boardY);
+                }
+                break;
+              case "SW":
+                if (boardX % 2 == boardY % 2) {
+                  return board.getNextDown(boardX,boardY);
+                } else {
+                  return board.getNextLeft(boardX,boardY);
+                }
+                break;
+            }
+          },
+          getNextRight: function(boardX,boardY) {
+            if (board.cells[boardX+1] && board.cells[boardX+1][boardY]) {
+              return [boardX+1, boardY];
+            }
+            else {
+              return [boardX, boardY];
+            }
+          },
+          getNextLeft: function(boardX,boardY) {
+            if (board.cells[boardX-1] && board.cells[boardX-1][boardY]) {
+              return [boardX-1, boardY];
+            }
+            else {
+              return [boardX, boardY];
+            }
+          },
+          getNextUp: function(boardX,boardY) {
+            if (board.cells[boardX] && board.cells[boardX][boardY+1]) {
+              return [boardX, boardY+1];
+            }
+            else {
+              return [boardX, boardY];
+            }
+          },
+          getNextDown: function(boardX,boardY) {
+            if (board.cells[boardX] && board.cells[boardX][boardY-1]) {
+              return [boardX, boardY-1];
+            }
+            else {
+              return [boardX, boardY];
+            }
+          },
+
+
           draw: function() {
               var edgeLength = board.edgeLength;
               var cellSize = board.cellSize;
@@ -93,81 +165,19 @@
             boardX: 0,
             boardY: 0
           },
-          length: 1,
+          length: 3,
           direction: "E",
 
           draw: function() {
               svg.selectAll("polyline").attr("fill","black");
-              // console.log(snake.headPosition.boardX,snake.headPosition.boardY)
               head = board.cells[snake.headPosition.boardX][snake.headPosition.boardY];
               head.attr("fill","red");
           },
 
           move: function() {
-              switch(snake.direction) {
-                case "E":
-                    snake.moveRight();
-                    break;
-                case "W":
-                    snake.moveLeft();
-                    break;
-                case "NE":
-                    if (snake.headPosition.boardX % 2 == snake.headPosition.boardY % 2) {
-                        snake.moveRight();
-                    } else {
-                        snake.moveUp();
-                    }
-                    break;
-                case "NW":
-                    if (snake.headPosition.boardX % 2 == snake.headPosition.boardY % 2) {
-                        snake.moveLeft();
-                    } else {
-                        snake.moveUp();
-                    }
-                    break;
-                case "SE":
-                    if (snake.headPosition.boardX % 2 == snake.headPosition.boardY % 2) {
-                        snake.moveDown();
-                    } else {
-                        snake.moveRight();
-                    }
-                    break;
-                case "SW":
-                    if (snake.headPosition.boardX % 2 == snake.headPosition.boardY % 2) {
-                        snake.moveDown();
-                    } else {
-                        snake.moveLeft();
-                    }
-                    break;
-              }
-          },
-          moveRight: function() {
-            if (board.cells[snake.headPosition.boardX+1] && board.cells[snake.headPosition.boardX+1][snake.headPosition.boardY]) {
-              snake.headPosition.boardX += 1;
-            }
-            // else {
-            //   snake.headPosition.boardX = snake.headPosition.boardY;
-            // }
-          },
-          moveLeft: function() {
-            if (board.cells[snake.headPosition.boardX-1] && board.cells[snake.headPosition.boardX-1][snake.headPosition.boardY]) {
-              snake.headPosition.boardX -= 1;
-            }
-            // else {
-            //   snake.headPosition.boardX = board.edgeLength-1-snake.headPosition.boardY;
-            // }
-          },
-          moveUp: function() {
-            if (board.cells[snake.headPosition.boardX] && board.cells[snake.headPosition.boardX][snake.headPosition.boardY+1]) {
-              snake.headPosition.boardY += 1;
-            }
-            //TODO: wrap
-          },
-          moveDown: function() {
-            if (board.cells[snake.headPosition.boardX] && board.cells[snake.headPosition.boardX][snake.headPosition.boardY-1]) {
-              snake.headPosition.boardY -= 1;
-            }
-            //TODO: wrap
+            var nextPosition = board.getNextCoordinates(snake.headPosition.boardX, snake.headPosition.boardY, snake.direction);
+            snake.headPosition.boardX = nextPosition[0];
+            snake.headPosition.boardY = nextPosition[1];
           },
 
           run: function() {
@@ -176,13 +186,12 @@
                   d3.select("#direction-"+snake.direction).classed("active", true);
                   snake.draw();
                   snake.move();
-              }, 500);
+              }, 200);
           }
       }
 
       document.addEventListener("keydown", function(e) {
           var key = e.key;
-          console.log(key);
           switch (key) {
             case "ArrowLeft":
               snake.direction = "W";
