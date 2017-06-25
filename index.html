@@ -9,19 +9,19 @@
   <body>
     <div id="controls">
       <div class="btn-group btn-group-justified">
-        <a id="direction-NW" class="btn btn-default" onclick="snake.direction='NW';">NW</a>
+        <a id="direction-NW" class="btn btn-default" onclick="changeDirection('NW');">NW</a>
         <a class="btn btn-default" disabled>N</a>
-        <a id="direction-NE" class="btn btn-default" onclick="snake.direction='NE';">NE</a>
+        <a id="direction-NE" class="btn btn-default" onclick="changeDirection('NE');">NE</a>
       </div>
       <div class="btn-group btn-group-justified">
-        <a id="direction-W" class="btn btn-default" onclick="snake.direction='W';">W</a>
+        <a id="direction-W" class="btn btn-default" onclick="changeDirection('W');">W</a>
         <a class="btn btn-default" disabled></a>
-        <a id="direction-E" class="btn btn-default" onclick="snake.direction='E';">E</a>
+        <a id="direction-E" class="btn btn-default" onclick="changeDirection('E');">E</a>
       </div>
       <div class="btn-group btn-group-justified">
-        <a id="direction-SW" class="btn btn-default" onclick="snake.direction='SW';">SW</a>
+        <a id="direction-SW" class="btn btn-default" onclick="changeDirection('SW');">SW</a>
         <a class="btn btn-default" disabled>S</a>
-        <a id="direction-SE" class="btn btn-default" onclick="snake.direction='SE';">SE</a>
+        <a id="direction-SE" class="btn btn-default" onclick="changeDirection('SE');">SE</a>
       </div>
     </div>
     <script>
@@ -188,7 +188,7 @@
             boardX: 0,
             boardY: 0
           },
-          length: 3,
+          length: 5,
           direction: "E",
 
           draw: function() {
@@ -199,10 +199,15 @@
               for(i=snake.length;i>0;i--) {
                   var cell = board.cells[drawX][drawY];
                   cell.attr("fill","red");
+                  var newDirection = cell.attr("data-change-direction");
+                  if (cell.attr("data-change-direction")) {
+                      bodyDirection = board.getOppositeDirection(newDirection);
+                  }
                   var next = board.getNextCoordinates(drawX, drawY, bodyDirection);
                   drawX = next[0];
                   drawY = next[1];
               }
+              svg.selectAll("polyline[fill=black]").attr("data-change-direction", null)
           },
 
           move: function() {
@@ -225,31 +230,46 @@
           var key = e.key;
           switch (key) {
             case "ArrowLeft":
-              snake.direction = "W";
+              changeDirection('W');
               e.preventDefault();
               break;
             case "ArrowRight":
-              snake.direction = "E";
+              changeDirection('E');
               e.preventDefault();
               break;
             case "ArrowUp":
               if (snake.direction.slice(-1) == "E") {
-                snake.direction = "NE";
+                changeDirection('NE');
               } else {
-                snake.direction = "NW";
+                changeDirection('NW');
               }
               e.preventDefault();
               break;
             case "ArrowDown":
               if (snake.direction.slice(-1) == "E") {
-                snake.direction = "SE";
+                changeDirection('SE');
               } else {
-                snake.direction = "SW";
+                changeDirection('SW');
               }
               e.preventDefault();
               break;
           }
       });
+
+      function changeDirection(newDirection) {
+          switch (newDirection) {
+            case "E":
+            case "W":
+            case "NE":
+            case "NW":
+            case "SE":
+            case "SW":
+              var currentCell = board.cells[snake.headPosition.boardX][snake.headPosition.boardY];
+              currentCell.attr("data-change-direction", snake.direction);
+              snake.direction = newDirection;
+              break;
+          }
+      }
 
       snake.run()
 
