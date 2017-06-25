@@ -213,8 +213,13 @@
 
           move: function() {
             var nextPosition = board.getNextCoordinates(snake.headPosition.boardX, snake.headPosition.boardY, snake.direction);
-            snake.headPosition.boardX = nextPosition[0];
-            snake.headPosition.boardY = nextPosition[1];
+            var nextCell = board.cells[nextPosition[0]][nextPosition[1]];
+            if (nextCell.attr("fill") == "black") {
+                snake.headPosition.boardX = nextPosition[0];
+                snake.headPosition.boardY = nextPosition[1];
+            } else {
+                console.error("collision!");
+            }
           },
 
           run: function() {
@@ -267,7 +272,10 @@
             case "SW":
               if (newDirection != board.getOppositeDirection(snake.direction)) {
                 var currentCell = board.cells[snake.headPosition.boardX][snake.headPosition.boardY];
-                currentCell.attr("data-change-direction", snake.direction);
+                //prevent losing old direction on multiple direction inputs
+                if (!currentCell.attr("data-change-direction")) {
+                    currentCell.attr("data-change-direction", snake.direction);
+                }
                 snake.direction = newDirection;
               }
               break;
