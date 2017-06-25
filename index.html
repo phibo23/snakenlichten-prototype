@@ -27,12 +27,12 @@
         .attr("width", width)
         .attr("height", height)
         .append("g")
-          .attr("transform", "translate(300,300) scale(1,-1)");
+          .attr("transform", "translate(100,500) scale(1,-1)");
 
       var board = {
           cells: {},
           edgeLength: 13,
-          cellSize: 20,
+          cellSize: 30,
 
           draw: function() {
               var edgeLength = board.edgeLength;
@@ -44,28 +44,42 @@
               var boardY = 0;
               for(n = edgeLength; n > 0; n-=2) {
                   for(m = rowLength; m > 0; m-=1) {
-                      cell=board.drawCell(x,y,cellSize);
+                      cell=board.drawCell(x,y,cellSize, boardX, boardY);
                       if (board.cells[boardX] == undefined) {
                         board.cells[boardX] = {};
                       }
                       board.cells[boardX][boardY] = cell;
                       cell.attr("data-board-x", boardX).attr("data-board-y", boardY);
-                      x+=2*cellSize;
+                      x+=1.5*cellSize;
                       boardX += 1;
                   }
-                  x=(2+edgeLength-rowLength)*cellSize;
-                  y+=2*cellSize;
+                  x=(2+edgeLength-rowLength)*cellSize*0.75;
+                  y+=2.5*cellSize;
                   boardY+=1;
                   boardX = boardY;
                   rowLength-=2;
               }
           },
-          drawCell: function(x,y,r) {
-            var cell = svg.append("circle")
-              .attr("cx", x)
-              .attr("cy",y)
-              .attr("r", r);
-              return cell;
+          drawCell: function(x,y,r, boardX, boardY) {
+            // var cell = svg.append("circle")
+            //   .attr("cx", x)
+            //   .attr("cy",y)
+            //   .attr("r", r);
+            //   return cell;
+            var p1,p2,p3;
+            if (boardX % 2 == boardY % 2) {
+              p1 = x+","+(y+r);
+              p2 = (x-r)+","+(y-r);
+              p3 = (x+r)+","+(y-r);
+            }  else {
+              p1 = x+","+(y-r);
+              p2 = (x-r)+","+(y+r);
+              p3 = (x+r)+","+(y+r);
+            }
+            return svg.append("polyline")
+              .attr("points", p1+" "+p2+" "+p3)
+              .attr("stroke-width", "2px")
+              .attr("stroke", "black");
           }
       };
 
@@ -80,7 +94,7 @@
           direction: "E",
 
           draw: function() {
-              svg.selectAll("circle").attr("fill","black");
+              svg.selectAll("polyline").attr("fill","black");
               // console.log(snake.headPosition.boardX,snake.headPosition.boardY)
               head = board.cells[snake.headPosition.boardX][snake.headPosition.boardY];
               head.attr("fill","red");
