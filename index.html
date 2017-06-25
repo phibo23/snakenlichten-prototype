@@ -179,6 +179,23 @@
                   return "NE"
                   break;
               }
+          },
+
+          createFood: function() {
+              var allCells = [];
+              for (var i in board.cells) {
+                for (var j in board.cells[i]) {
+                  allCells.push(board.cells[i][j]);
+                }
+              }
+              var done = false;
+              while(!done) {
+                var foodCell = allCells[Math.floor(Math.random() * allCells.length)];
+                if (!foodCell.attr("data-body-part")) {
+                  foodCell.attr("data-is-food",true);
+                  done=true;
+                }
+              }
           }
       };
 
@@ -189,17 +206,23 @@
             boardX: 0,
             boardY: 0
           },
-          length: 10,
+          length: 1,
           direction: "E",
 
           draw: function() {
-              svg.selectAll("polyline").attr("fill","black");
+              svg.selectAll("polyline")
+                .attr("fill","black")
+                .attr("data-body-part", null);
+              svg.selectAll("polyline[data-is-food=true]")
+                .attr("fill","green");
               var drawX = snake.headPosition.boardX;
               var drawY = snake.headPosition.boardY;
               var bodyDirection = board.getOppositeDirection(snake.direction);
+              var drawColor = d3.rgb("#ff0000");
               for(i=snake.length;i>0;i--) {
                   var cell = board.cells[drawX][drawY];
-                  cell.attr("fill","red");
+                  cell.attr("fill",drawColor);
+                  cell.attr("data-body-part", snake.length-i);
                   var newDirection = cell.attr("data-change-direction");
                   if (cell.attr("data-change-direction")) {
                       bodyDirection = board.getOppositeDirection(newDirection);
@@ -207,6 +230,7 @@
                   var next = board.getNextCoordinates(drawX, drawY, bodyDirection);
                   drawX = next[0];
                   drawY = next[1];
+                  drawColor = drawColor.darker(0.1);
               }
               svg.selectAll("polyline[fill=black]").attr("data-change-direction", null)
           },
@@ -214,15 +238,27 @@
           move: function() {
             var nextPosition = board.getNextCoordinates(snake.headPosition.boardX, snake.headPosition.boardY, snake.direction);
             var nextCell = board.cells[nextPosition[0]][nextPosition[1]];
-            if (nextCell.attr("fill") == "black") {
+            //basic collision detection
+            //allow crossing of first body part after head (otherwise stuck in corners)
+            if (nextCell.attr("fill") == "black"
+                || nextCell.attr("data-body-part") == 1
+                || nextCell.attr("data-is-food")) {
+                if (nextCell.attr("data-is-food")) {
+                  snake.length += 1;
+                  nextCell.attr("data-is-food", null);
+                  board.createFood();
+                }
                 snake.headPosition.boardX = nextPosition[0];
                 snake.headPosition.boardY = nextPosition[1];
             } else {
                 console.error("collision!");
             }
-          },
+          }
+      }
 
+      var game = {
           run: function() {
+              board.createFood();
               var t = d3.interval(function(elapsed) {
                   d3.selectAll("#controls .btn").classed("active", false);
                   d3.select("#direction-"+snake.direction).classed("active", true);
@@ -282,7 +318,7 @@
           }
       }
 
-      snake.run()
+      game.run()
 
     </script>
   </body>
