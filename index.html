@@ -8,6 +8,7 @@
   </head>
   <body>
     <div id="controls">
+      <div class="alert alert-warning">Basic arrow key support but not great for situations like "change from E to NW"</div>
       <div class="btn-group btn-group-justified">
         <a id="direction-NW" class="btn btn-default" onclick="changeDirection('NW');">NW</a>
         <a class="btn btn-default" disabled>N</a>
@@ -188,7 +189,7 @@
             boardX: 0,
             boardY: 0
           },
-          length: 5,
+          length: 10,
           direction: "E",
 
           draw: function() {
