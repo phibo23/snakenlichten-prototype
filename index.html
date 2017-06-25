@@ -10,14 +10,17 @@
     <div id="controls">
       <div class="btn-group btn-group-justified">
         <a id="direction-NW" class="btn btn-default" onclick="snake.direction='NW';">NW</a>
+        <a class="btn btn-default" disabled>N</a>
         <a id="direction-NE" class="btn btn-default" onclick="snake.direction='NE';">NE</a>
       </div>
       <div class="btn-group btn-group-justified">
         <a id="direction-W" class="btn btn-default" onclick="snake.direction='W';">W</a>
+        <a class="btn btn-default" disabled></a>
         <a id="direction-E" class="btn btn-default" onclick="snake.direction='E';">E</a>
       </div>
       <div class="btn-group btn-group-justified">
         <a id="direction-SW" class="btn btn-default" onclick="snake.direction='SW';">SW</a>
+        <a class="btn btn-default" disabled>S</a>
         <a id="direction-SE" class="btn btn-default" onclick="snake.direction='SE';">SE</a>
       </div>
     </div>
@@ -176,6 +179,37 @@
               }, 500);
           }
       }
+
+      document.addEventListener("keydown", function(e) {
+          var key = e.key;
+          console.log(key);
+          switch (key) {
+            case "ArrowLeft":
+              snake.direction = "W";
+              e.preventDefault();
+              break;
+            case "ArrowRight":
+              snake.direction = "E";
+              e.preventDefault();
+              break;
+            case "ArrowUp":
+              if (snake.direction.slice(-1) == "E") {
+                snake.direction = "NE";
+              } else {
+                snake.direction = "NW";
+              }
+              e.preventDefault();
+              break;
+            case "ArrowDown":
+              if (snake.direction.slice(-1) == "E") {
+                snake.direction = "SE";
+              } else {
+                snake.direction = "SW";
+              }
+              e.preventDefault();
+              break;
+          }
+      });
 
       snake.run()
 
