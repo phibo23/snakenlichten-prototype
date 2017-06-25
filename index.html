@@ -155,6 +155,29 @@
               .attr("points", p1+" "+p2+" "+p3)
               .attr("stroke-width", "2px")
               .attr("stroke", "black");
+          },
+
+          getOppositeDirection(direction) {
+              switch (direction) {
+                case "E":
+                  return "W"
+                  break;
+                case "W":
+                  return "E"
+                  break;
+                case "NE":
+                  return "SW"
+                  break;
+                case "NW":
+                  return "SE"
+                  break;
+                case "SE":
+                  return "NW"
+                  break;
+                case "SW":
+                  return "NE"
+                  break;
+              }
           }
       };
 
@@ -170,8 +193,16 @@
 
           draw: function() {
               svg.selectAll("polyline").attr("fill","black");
-              head = board.cells[snake.headPosition.boardX][snake.headPosition.boardY];
-              head.attr("fill","red");
+              var drawX = snake.headPosition.boardX;
+              var drawY = snake.headPosition.boardY;
+              var bodyDirection = board.getOppositeDirection(snake.direction);
+              for(i=snake.length;i>0;i--) {
+                  var cell = board.cells[drawX][drawY];
+                  cell.attr("fill","red");
+                  var next = board.getNextCoordinates(drawX, drawY, bodyDirection);
+                  drawX = next[0];
+                  drawY = next[1];
+              }
           },
 
           move: function() {
